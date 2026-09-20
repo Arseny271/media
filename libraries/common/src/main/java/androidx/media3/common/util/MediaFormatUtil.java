@@ -341,6 +341,25 @@ public final class MediaFormatUtil {
   }
 
   /**
+   * Returns the value of a key whose value can be set as int or float.
+   *
+   * <p>The {@code defaultValue} is returned if the key is not present in the {@link MediaFormat}.
+   *
+   * @throws ClassCastException If the stored value for the key is other than int or float.
+   */
+  public static float getFloatFromIntOrFloat(
+          MediaFormat mediaFormat, String keyName, float defaultValue) {
+    if (!mediaFormat.containsKey(keyName)) {
+      return defaultValue;
+    }
+    try {
+      return mediaFormat.getFloat(keyName);
+    } catch (ClassCastException e) {
+      return mediaFormat.getInteger(keyName);
+    }
+  }
+
+  /**
    * Returns a {@code Codecs string} of {@link MediaFormat}.
    *
    * <p>For H263 and Dolby Vision formats, builds a codec string using profile and level.
