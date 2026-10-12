@@ -47,7 +47,7 @@ dependencies {
         rootProject.allprojects.forEach {
             if (it.hasProperty('releaseArtifactId')
                     && it.releaseArtifactId.startsWith('media3-')) {
-              implementation project(':' + it.name)
+              implementation project(':TMessagesProj_Modules:media3:' + it.name)
             }
         }
     }

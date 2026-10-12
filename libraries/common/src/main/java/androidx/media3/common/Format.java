@@ -158,6 +158,10 @@ public final class Format {
     @Nullable private Metadata metadata;
     @Nullable private Object customData;
     @Nullable private String primaryTrackGroupId;
+    public boolean cached;
+    public long documentId;
+    public String documentFilename;
+    public int currentAccount;
 
     // Container specific.
 
@@ -240,6 +244,7 @@ public final class Format {
       // Provided by the source.
       cryptoType = C.CRYPTO_TYPE_NONE;
       auxiliaryTrackType = C.AUXILIARY_TRACK_TYPE_UNDEFINED;
+      cached = false;
     }
 
     /**
@@ -296,6 +301,10 @@ public final class Format {
       this.tileCountVertical = format.tileCountVertical;
       // Provided by the source.
       this.cryptoType = format.cryptoType;
+      this.cached = format.cached;
+      this.documentId = format.documentId;
+      this.currentAccount = format.currentAccount;
+      this.documentFilename = format.documentFilename;
     }
 
     /**
@@ -320,6 +329,46 @@ public final class Format {
     @CanIgnoreReturnValue
     public Builder setId(int id) {
       this.id = Integer.toString(id);
+      return this;
+    }
+
+    @CanIgnoreReturnValue
+    public Builder setCached(boolean cached) {
+      this.cached = cached;
+      return this;
+    }
+
+    @CanIgnoreReturnValue
+    public Builder setDocumentId(String documentId) {
+      try {
+        this.documentId = Long.parseLong(documentId);
+      } catch (Exception e) {}
+      return this;
+    }
+
+    @CanIgnoreReturnValue
+    public Builder setDocumentId(long documentId) {
+      this.documentId = documentId;
+      return this;
+    }
+
+    @CanIgnoreReturnValue
+    public Builder setCurrentAccount(int currentAccount) {
+      this.currentAccount = currentAccount;
+      return this;
+    }
+
+    @CanIgnoreReturnValue
+    public Builder setCurrentAccount(String currentAccount) {
+      try {
+        this.currentAccount = Integer.parseInt(currentAccount);
+      } catch (Exception e) {}
+      return this;
+    }
+
+    @CanIgnoreReturnValue
+    public Builder setDocumentFilename(String filename) {
+      this.documentFilename = filename;
       return this;
     }
 
@@ -1004,6 +1053,11 @@ public final class Format {
    */
   @UnstableApi @Nullable public final String primaryTrackGroupId;
 
+  public boolean cached;
+  public long documentId;
+  public int currentAccount;
+  public String documentFilename;
+
   // Container specific.
 
   /** The MIME type of the container, or null if unknown or not applicable. */
@@ -1207,6 +1261,10 @@ public final class Format {
     metadata = builder.metadata;
     customData = builder.customData;
     primaryTrackGroupId = builder.primaryTrackGroupId;
+    cached = builder.cached;
+    documentId = builder.documentId;
+    currentAccount = builder.currentAccount;
+    documentFilename = builder.documentFilename;
     // Container specific.
     containerMimeType = builder.containerMimeType;
     // Sample specific.
