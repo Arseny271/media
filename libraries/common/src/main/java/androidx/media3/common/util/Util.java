@@ -2988,7 +2988,7 @@ public final class Util {
       default:
         try {
           return UUID.fromString(drmScheme);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
           return null;
         }
     }
@@ -4410,13 +4410,31 @@ public final class Util {
   }
 
   private static boolean requestExternalStoragePermission(Activity activity) {
-    if (activity.checkSelfPermission(permission.READ_EXTERNAL_STORAGE)
-        != PackageManager.PERMISSION_GRANTED) {
-      activity.requestPermissions(
-          new String[] {permission.READ_EXTERNAL_STORAGE}, /* requestCode= */ 0);
-      return true;
+    if (Build.VERSION.SDK_INT >= 33) {
+      ArrayList<String> permissions = new ArrayList<>();
+      if (activity.checkSelfPermission(permission.READ_MEDIA_VIDEO) != PackageManager.PERMISSION_GRANTED) {
+        permissions.add(permission.READ_MEDIA_VIDEO);
+      }
+      if (activity.checkSelfPermission(permission.READ_MEDIA_IMAGES) != PackageManager.PERMISSION_GRANTED) {
+        permissions.add(permission.READ_MEDIA_IMAGES);
+      }
+      if (activity.checkSelfPermission(permission.READ_MEDIA_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+        permissions.add(permission.READ_MEDIA_AUDIO);
+      }
+      if (!permissions.isEmpty()) {
+        activity.requestPermissions(permissions.toArray(new String[0]), /* requestCode= */ 0);
+        return true;
+      }
+      return false;
+    } else {
+      if (activity.checkSelfPermission(permission.READ_EXTERNAL_STORAGE)
+          != PackageManager.PERMISSION_GRANTED) {
+        activity.requestPermissions(
+          new String[]{permission.READ_EXTERNAL_STORAGE}, /* requestCode= */ 0);
+        return true;
+      }
+      return false;
     }
-    return false;
   }
 
   @RequiresApi(api = 33)

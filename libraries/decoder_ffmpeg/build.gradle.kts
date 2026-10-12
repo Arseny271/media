@@ -21,13 +21,8 @@ android {
 
 // Configure the native build only if ffmpeg is present to avoid gradle sync
 // failures if ffmpeg hasn't been built according to the README instructions.
-if (project.file("src/main/jni/ffmpeg").exists()) {
-  android.externalNativeBuild.cmake.path = file("src/main/jni/CMakeLists.txt")
-  // LINT.IfChange
-  // Should match cmake_minimum_required.
-  android.externalNativeBuild.cmake.version = "3.21.0+"
-  // LINT.ThenChange(src/main/jni/CMakeLists.txt)
-}
+// Telegram: the JNI code (ffmpeg_jni.cc) is built into libtmessages by TMessagesProj's CMake
+// against Telegram's own FFmpeg, so this module has no native build of its own.
 
 dependencies {
   api(project(":lib-decoder"))

@@ -337,7 +337,7 @@ public final class DefaultBandwidthMeter implements BandwidthMeter, TransferList
   private long totalBytesTransferred;
 
   @GuardedBy("this") // Used in TransferListener methods that are called on a background thread.
-  private long bitrateEstimate;
+  private volatile long bitrateEstimate;
 
   @GuardedBy("this") // Used in TransferListener methods that are called on a background thread.
   private long lastReportedBitrateEstimate;
@@ -459,6 +459,26 @@ public final class DefaultBandwidthMeter implements BandwidthMeter, TransferList
     streamCount--;
   }
 
+  public synchronized void onTransfer(long bytes, long duration) {
+    long nowMs = clock.elapsedRealtime();
+    int sampleElapsedTimeMs = (int) (nowMs - sampleStartTimeMs);
+    totalElapsedTimeMs += sampleElapsedTimeMs;
+    totalBytesTransferred += bytes;
+    if (duration > 0 && bytes > 0) {
+      // FileLog.d("debug_loading: bandwidth meter on transfer " + AndroidUtilities.formatFileSize(bytes) + " per " +duration + "ms");
+      float bitsPerSecond = (bytes * 8000f) / duration;
+      slidingPercentile.addSample((int) Math.sqrt(bytes), bitsPerSecond);
+      if (totalElapsedTimeMs >= ELAPSED_MILLIS_FOR_ESTIMATE
+              || totalBytesTransferred >= BYTES_TRANSFERRED_FOR_ESTIMATE) {
+        bitrateEstimate = (long) slidingPercentile.getPercentile(0.5f);
+        // FileLog.d("debug_loading: bandwidth meter (onTransfer), bitrate estimate = " + bitrateEstimate);
+      }
+      maybeNotifyBandwidthSample((int) duration, bytes, bitrateEstimate);
+      sampleStartTimeMs = nowMs;
+      sampleBytesTransferred = 0;
+    }
+  }
+
   private synchronized void onNetworkTypeChanged(@C.NetworkType int networkType) {
     if (this.networkType != C.NETWORK_TYPE_UNKNOWN && !resetOnNetworkTypeChange) {
       // Reset on network change disabled. Ignore all updates except the initial one.
@@ -528,7 +548,7 @@ public final class DefaultBandwidthMeter implements BandwidthMeter, TransferList
   }
 
   private static boolean isTransferAtFullNetworkSpeed(DataSpec dataSpec, boolean isNetwork) {
-    return isNetwork && !dataSpec.isFlagSet(DataSpec.FLAG_MIGHT_NOT_USE_FULL_NETWORK_SPEED);
+    return isNetwork && (dataSpec == null || !dataSpec.isFlagSet(DataSpec.FLAG_MIGHT_NOT_USE_FULL_NETWORK_SPEED));
   }
 
   private static long getInitialBitrateEstimatesForCountry(

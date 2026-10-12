@@ -429,16 +429,20 @@ import org.checkerframework.checker.initialization.qual.Initialized;
     List<ResolveInfo> resolveInfos = pm.queryBroadcastReceivers(queryIntent, /* flags= */ 0);
     if (resolveInfos.size() == 1) {
       ResolveInfo resolveInfo = resolveInfos.get(0);
-      return new ComponentName(resolveInfo.activityInfo.packageName, resolveInfo.activityInfo.name);
-    } else if (resolveInfos.isEmpty()) {
-      return null;
-    } else {
-      throw new IllegalStateException(
-          "Expected 1 broadcast receiver that handles "
+      return new ComponentName(
+          resolveInfo.activityInfo.packageName,
+          resolveInfo.activityInfo.name);
+    }
+
+    if (resolveInfos.size() > 1) {
+      Log.w(TAG, "Expected 1 broadcast receiver that handles "
               + Intent.ACTION_MEDIA_BUTTON
               + ", found "
-              + resolveInfos.size());
+              + resolveInfos.size()
+              + ". Using runtime media button receiver instead.");
     }
+
+    return null;
   }
 
   /** Starts to receive commands. */

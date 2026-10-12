@@ -33,7 +33,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
  * Parser for motion photo metadata, handling XMP following the Motion Photo V1 and Micro Video V1b
  * specifications.
  */
-/* package */ final class XmpMotionPhotoDescriptionParser {
+public final class XmpMotionPhotoDescriptionParser {
 
   /**
    * Attempts to parse the specified XMP data describing the motion photo, returning the resulting

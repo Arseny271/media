@@ -137,7 +137,7 @@ public final class DefaultExtractorsFactory implements ExtractorsFactory {
   private static final ExtensionLoader MIDI_EXTENSION_LOADER =
       new ExtensionLoader(DefaultExtractorsFactory::getMidiExtractorConstructor);
 
-  private boolean constantBitrateSeekingEnabled;
+  private boolean constantBitrateSeekingEnabled = true;
   private boolean constantBitrateSeekingAlwaysEnabled;
   private boolean disableArtworkMetadata;
   private @AdtsExtractor.Flags int adtsFlags;
