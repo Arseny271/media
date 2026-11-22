@@ -16,11 +16,10 @@ apply from: "$gradle.ext.androidxMediaSettingsDir/constants.gradle"
 group = 'androidx.media3'
 
 android {
-    compileSdkVersion project.ext.compileSdkVersion
+    compileSdk project.ext.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion project.ext.minSdkVersion
-        targetSdkVersion project.ext.targetSdkVersion
+        minSdk project.ext.minSdkVersion
         consumerProguardFiles 'proguard-rules.txt'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         aarMetadata {
@@ -32,8 +31,9 @@ android {
         testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
-    lintOptions {
-        checkTestSources true
+    lint {
+        checkTestSources = true
+        targetSdk = project.ext.targetSdkVersion
     }
 
     compileOptions {
@@ -42,6 +42,7 @@ android {
     }
 
     testOptions {
+        targetSdk = project.ext.targetSdkVersion
         unitTests.all {
             jvmArgs "-Xmx2g"
             systemProperty "robolectric.graphicsMode", "NATIVE"
